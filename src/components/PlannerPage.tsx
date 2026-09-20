@@ -214,7 +214,7 @@ export default function PlannerPage() {
                             {subjects.length > 1 && (
                               <button
                                 onClick={() => removeSubject(subject.id)}
-                                className="flex-shrink-0 h-10 w-10 rounded-xl bg-white/[0.04] border border-white/[0.08] text-ink-400 hover:text-red-400 hover:border-red-500/30 transition-all duration-200 flex items-center justify-center"
+                                className="shrink-0 h-10 w-10 rounded-xl bg-white/[0.04] border border-white/[0.08] text-ink-400 hover:text-red-400 hover:border-red-500/30 transition-all duration-200 flex items-center justify-center"
                                 aria-label="Remove subject"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -271,7 +271,7 @@ export default function PlannerPage() {
                         onChange={(e) => setStudyHours(e.target.value)}
                         className="flex-1 accent-primary-500"
                       />
-                      <div className="flex-shrink-0 w-16 px-3 py-2 rounded-lg bg-primary-500/10 border border-primary-500/20 text-center">
+                      <div className="shrink-0 w-16 px-3 py-2 rounded-lg bg-primary-500/10 border border-primary-500/20 text-center">
                         <span className="text-sm font-semibold text-primary-300">{studyHours}h</span>
                       </div>
                     </div>
@@ -395,7 +395,7 @@ export default function PlannerPage() {
                   <div className="glass-card p-5 sm:p-6 animate-scale-in">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-500/10 border border-white/10 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-linear-to-br from-primary-500/20 to-accent-500/10 border border-white/10 flex items-center justify-center">
                           <CalendarClock className="h-5 w-5 text-primary-300" />
                         </div>
                         <div>
@@ -420,7 +420,7 @@ export default function PlannerPage() {
                       </div>
                       <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-500"
+                          className="h-full rounded-full bg-linear-to-r from-primary-500 to-accent-500 transition-all duration-500"
                           style={{ width: `${progressPct}%` }}
                         />
                       </div>
@@ -464,13 +464,13 @@ export default function PlannerPage() {
                         >
                           <div className="flex items-start gap-4">
                             {/* Day number */}
-                            <div className="flex-shrink-0 flex flex-col items-center">
+                            <div className="shrink-0 flex flex-col items-center">
                               <div className={`h-12 w-12 rounded-xl border flex flex-col items-center justify-center ${
                                 day.isBreak
                                   ? 'bg-accent-500/10 border-accent-500/20'
                                   : day.isRevision
                                   ? 'bg-primary-500/10 border-primary-500/20'
-                                  : 'bg-gradient-to-br from-primary-500/15 to-primary-700/5 border-primary-500/20'
+                                  : 'bg-linear-to-br from-primary-500/15 to-primary-700/5 border-primary-500/20'
                               }`}>
                                 <span className="text-[10px] font-medium text-ink-500 leading-none">{day.weekday}</span>
                                 <span className="text-sm font-bold text-white leading-none mt-0.5">{day.day}</span>
@@ -516,7 +516,7 @@ export default function PlannerPage() {
                                 {/* Check toggle */}
                                 <button
                                   onClick={() => toggleTask(i)}
-                                  className="flex-shrink-0 transition-all duration-200 hover:scale-110"
+                                  className="shrink-0 transition-all duration-200 hover:scale-110"
                                   aria-label={isDone ? 'Mark as incomplete' : 'Mark as complete'}
                                 >
                                   {isDone ? (
@@ -535,7 +535,7 @@ export default function PlannerPage() {
 
                   {/* Footer note */}
                   <div className="glass-panel px-5 py-4 flex items-center gap-3">
-                    <Sparkles className="h-4 w-4 text-accent-400 flex-shrink-0" />
+                    <Sparkles className="h-4 w-4 text-accent-400 shrink-0" />
                     <p className="text-xs text-ink-400 leading-relaxed">
                       This study plan was generated by JARVIS using Google Gemini AI.
                       Topics, revision days, and light days are balanced to keep your prep low-stress.
