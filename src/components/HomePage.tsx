@@ -19,10 +19,10 @@ export function HomePage() {
     if (!query || asking) return;
     setQuestion(query); setAnswer(""); setError(""); setAsking(true);
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/jarvis-ask`;
+      const apiUrl = `${import.meta.env['VITE_SUPABASE_URL']}/functions/v1/jarvis-ask`;
       const response = await fetch(apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env['VITE_SUPABASE_ANON_KEY']}` },
         body: JSON.stringify({ question: query }),
       });
       const data = await response.json();
