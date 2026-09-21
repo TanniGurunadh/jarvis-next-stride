@@ -6,6 +6,7 @@ import {
   RefreshCw, Coffee, Repeat,
 } from 'lucide-react';
 import { JarvisCore } from './JarvisCore';
+import { saveStudyPlan } from '@/lib/jarvis/repository';
 
 type Confidence = 'high' | 'medium' | 'low';
 
