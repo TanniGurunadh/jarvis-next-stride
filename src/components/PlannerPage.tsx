@@ -58,6 +58,7 @@ export default function PlannerPage() {
   const [completedTasks, setCompletedTasks] = useState<Set<number>>(new Set());
   const [error, setError] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [saveNotice, setSaveNotice] = useState('');
 
   const addSubject = () => {
     setSubjects([...subjects, { id: crypto.randomUUID(), name: '', topics: '' }]);
@@ -130,6 +131,24 @@ export default function PlannerPage() {
       }
 
       setPlan(data.plan);
+
+      // Persist the plan + its daily tasks so Today's Mission and Progress use real data.
+      const saved = await saveStudyPlan({
+        examDate,
+        studyHours: hours,
+        confidence,
+        days: (data.plan as StudyDay[]).map((day) => ({
+          day: day.day,
+          date: day.date,
+          subject: day.subject,
+          topic: day.topic,
+          hours: day.hours,
+          focus: day.focus,
+          isRevision: day.isRevision,
+          isBreak: day.isBreak,
+        })),
+      });
+      setSaveNotice(saved.error ?? '');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       setErrorMsg(message);
