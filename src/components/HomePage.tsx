@@ -1,8 +1,11 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, CalendarDays, Check, Clock3, Flame, Focus, HelpCircle, MessageSquareText, Quote, RotateCcw, Send, Target, Trophy } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, Check, Clock3, Flame, Focus, HelpCircle, MessageSquareText, Quote, RotateCcw, Send, Trophy } from "lucide-react";
 import spaceHorizon from "@/assets/jarvis-space-horizon.jpg";
 import { JarvisCore } from "./JarvisCore";
+import { QuizPanel } from "./QuizPanel";
+import { FocusPanel } from "./FocusPanel";
+import { useJarvisData } from "@/hooks/useJarvisData";
 
 const examples = ["Explain photosynthesis in simple words", "What is the Pythagorean theorem?", "Help me revise Java inheritance"];
 
@@ -12,8 +15,12 @@ export function HomePage() {
   const [asking, setAsking] = useState(false);
   const [error, setError] = useState("");
   const askRef = useRef<HTMLElement>(null);
+  const quizRef = useRef<HTMLDivElement>(null);
+  const focusRef = useRef<HTMLDivElement>(null);
+  const { mission, progress, refresh, completeMission } = useJarvisData();
 
-  const openAsk = () => askRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const scrollTo = (element: HTMLElement | null) => element?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const openAsk = () => scrollTo(askRef.current);
   const askJarvis = async (suggestion?: string) => {
     const query = (suggestion ?? question).trim();
     if (!query || asking) return;
@@ -37,9 +44,11 @@ export function HomePage() {
   const actions = [
     { icon: CalendarDays, title: "Study Planner", text: "Create a personalized study plan.", to: "/planner" as const },
     { icon: MessageSquareText, title: "Ask JARVIS", text: "Get AI-powered answers to your doubts.", action: openAsk },
-    { icon: BookOpen, title: "Quiz Me", text: "Practice with AI-generated questions.", action: () => { setQuestion("Quiz me on a topic I am studying"); openAsk(); } },
-    { icon: Focus, title: "Focus Mode", text: "Stay focused and get more done.", to: "/planner" as const },
+    { icon: BookOpen, title: "Quiz Me", text: "Practice with AI-generated questions.", action: () => scrollTo(quizRef.current) },
+    { icon: Focus, title: "Focus Mode", text: "Stay focused and get more done.", action: () => scrollTo(focusRef.current) },
   ];
+
+  const completionPercent = progress.completionPercent;
 
   return (
     <main className="min-h-screen overflow-hidden bg-background">
@@ -67,16 +76,43 @@ export function HomePage() {
 
         <section className="mt-5 grid gap-4 lg:grid-cols-[1.08fr_1.14fr_.88fr]">
           <article className="glass-card flex min-h-56 flex-col p-5">
-            <div className="flex items-center justify-between"><p className="panel-title">TODAY'S MISSION</p><span className="priority-pill">HIGH PRIORITY</span></div>
-            <div className="mt-5 flex gap-4"><span className="feature-icon"><BookOpen /></span><div><h2 className="text-lg font-semibold">Java – Inheritance</h2><p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5" />45 Minutes</p><p className="mt-3 text-sm text-muted-foreground">Complete constructor and inheritance revision.</p></div></div>
-            <Link to="/planner" className="mission-button mt-auto">Start Mission <ArrowRight className="h-4 w-4" /></Link>
+            <div className="flex items-center justify-between">
+              <p className="panel-title">TODAY'S MISSION</p>
+              {mission.hasMission && <span className="priority-pill">{mission.priority.toUpperCase()} PRIORITY</span>}
+            </div>
+            {mission.hasMission ? (
+              <>
+                <div className="mt-5 flex gap-4">
+                  <span className="feature-icon"><BookOpen /></span>
+                  <div>
+                    <h2 className="text-lg font-semibold">{mission.subject} – {mission.title}</h2>
+                    <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5" />{mission.duration} Minutes</p>
+                    <p className="mt-3 text-sm text-muted-foreground">{mission.description}</p>
+                  </div>
+                </div>
+                <button className="mission-button mt-auto" onClick={() => scrollTo(focusRef.current)}>
+                  {mission.completed ? "Mission completed" : "Start Mission"} <ArrowRight className="h-4 w-4" />
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="mt-5 text-sm text-muted-foreground">No mission yet. Generate a study plan and JARVIS will set today's task from it.</p>
+                <Link to="/planner" className="mission-button mt-auto">Create a study plan <ArrowRight className="h-4 w-4" /></Link>
+              </>
+            )}
           </article>
 
           <article className="glass-card min-h-56 p-5">
             <div className="flex items-center justify-between"><p className="panel-title">YOUR PROGRESS</p><Link to="/planner" className="text-xs text-muted-foreground hover:text-cyan">View details →</Link></div>
             <div className="mt-5 grid grid-cols-[120px_1fr] items-center gap-5">
-              <div className="progress-ring"><div><strong>72%</strong><span>Completed</span></div></div>
-              <div className="space-y-3 text-sm"><p className="metric"><Check /> <strong>12</strong><span>Topics Completed</span></p><p className="metric"><Flame /> <strong>5</strong><span>Day Streak</span></p><p className="metric"><Trophy /> <strong>8</strong><span>Quizzes Taken</span></p></div>
+              <div className="progress-ring" style={{ ["--progress" as string]: `${completionPercent ?? 0}%` }}>
+                <div><strong>{completionPercent === null ? "—" : `${completionPercent}%`}</strong><span>Completed</span></div>
+              </div>
+              <div className="space-y-3 text-sm">
+                <p className="metric"><Check /> <strong>{progress.topicsCompleted}</strong><span>Topics Completed</span></p>
+                <p className="metric"><Flame /> <strong>{progress.currentStreak}</strong><span>Day Streak</span></p>
+                <p className="metric"><Trophy /> <strong>{progress.quizzesTaken}</strong><span>Quizzes Taken</span></p>
+              </div>
             </div>
           </article>
 
@@ -92,6 +128,9 @@ export function HomePage() {
             {answer && <div className="answer-panel mt-5"><p className="panel-title">JARVIS RESPONSE</p><p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">{answer}</p></div>}
           </div></div>
         </section>
+
+        <div ref={quizRef}><QuizPanel onCompleted={() => void refresh()} /></div>
+        <div ref={focusRef}><FocusPanel mission={mission} onMissionCompleted={completeMission} /></div>
 
         <footer className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-border py-6 text-[10px] tracking-[0.28em] text-muted-foreground sm:flex-row"><span>BUILT FOR LEARNERS • POWERED BY AI</span><span>v1.0</span></footer>
       </div>
