@@ -6,6 +6,7 @@ import { JarvisCore } from "./JarvisCore";
 import { QuizPanel } from "./QuizPanel";
 import { FocusPanel } from "./FocusPanel";
 import { useJarvisData } from "@/hooks/useJarvisData";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/jarvis/config";
 
 const examples = ["Explain photosynthesis in simple words", "What is the Pythagorean theorem?", "Help me revise Java inheritance"];
 

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { JarvisCore } from './JarvisCore';
 import { saveStudyPlan } from '@/lib/jarvis/repository';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/jarvis/config';
 
 type Confidence = 'high' | 'medium' | 'low';
 
