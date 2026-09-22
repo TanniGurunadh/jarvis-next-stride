@@ -105,12 +105,12 @@ export default function PlannerPage() {
     setCompletedTasks(new Set());
 
     try {
-      const apiUrl = `${import.meta.env['VITE_SUPABASE_URL']}/functions/v1/generate-study-plan`;
+      const apiUrl = `${SUPABASE_URL}/functions/v1/generate-study-plan`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env['VITE_SUPABASE_ANON_KEY']}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           subjects: validSubjects.map((s) => ({ name: s.name.trim(), topics: s.topics.trim() })),

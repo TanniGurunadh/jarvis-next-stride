@@ -1,8 +1,7 @@
 // Minimal typed access to the project's existing Supabase project (Data API + Edge Functions).
 // No second backend: everything goes through VITE_SUPABASE_URL with the publishable anon key.
 
-const SUPABASE_URL = import.meta.env["VITE_SUPABASE_URL"] as string | undefined;
-const SUPABASE_ANON_KEY = import.meta.env["VITE_SUPABASE_ANON_KEY"] as string | undefined;
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config";
 
 export interface ApiResult<T> {
   data: T | null;
