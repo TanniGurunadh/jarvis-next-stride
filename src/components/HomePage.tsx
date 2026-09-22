@@ -26,20 +26,12 @@ export function HomePage() {
     const query = (suggestion ?? question).trim();
     if (!query || asking) return;
     setQuestion(query); setAnswer(""); setError(""); setAsking(true);
-    try {
-      const apiUrl = `${SUPABASE_URL}/functions/v1/jarvis-ask`;
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-        body: JSON.stringify({ question: query }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error || "Failed to get a response.");
-      if (!data.answer) throw new Error("The AI returned an empty response.");
-      setAnswer(data.answer);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong. Please try again.");
-    } finally { setAsking(false); }
+    // invokeFunction retries the AI service on temporary 429/5xx replies.
+    const { data, error: failed } = await invokeFunction<{ answer?: string }>("jarvis-ask", { question: query });
+    if (failed) setError(failed);
+    else if (!data?.answer) setError("The AI returned an empty response. Please try again.");
+    else setAnswer(data.answer);
+    setAsking(false);
   };
 
   const actions = [
