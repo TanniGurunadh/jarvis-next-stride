@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { JarvisCore } from './JarvisCore';
 import { saveStudyPlan } from '@/lib/jarvis/repository';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/jarvis/config';
 
 type Confidence = 'high' | 'medium' | 'low';
 
@@ -105,12 +106,12 @@ export default function PlannerPage() {
     setCompletedTasks(new Set());
 
     try {
-      const apiUrl = `${import.meta.env['VITE_SUPABASE_URL']}/functions/v1/generate-study-plan`;
+      const apiUrl = `${SUPABASE_URL}/functions/v1/generate-study-plan`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env['VITE_SUPABASE_ANON_KEY']}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           subjects: validSubjects.map((s) => ({ name: s.name.trim(), topics: s.topics.trim() })),
@@ -161,6 +162,7 @@ export default function PlannerPage() {
     setPlan(null);
     setCompletedTasks(new Set());
     setErrorMsg('');
+    setSaveNotice('');
   };
 
   const completedCount = completedTasks.size;
@@ -552,6 +554,12 @@ export default function PlannerPage() {
                       );
                     })}
                   </div>
+
+                  {saveNotice && (
+                    <div className="glass-panel px-5 py-4 text-xs text-ink-400 leading-relaxed">
+                      Plan shown but not saved for your dashboard: {saveNotice}
+                    </div>
+                  )}
 
                   {/* Footer note */}
                   <div className="glass-panel px-5 py-4 flex items-center gap-3">

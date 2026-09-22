@@ -6,6 +6,7 @@ import { JarvisCore } from "./JarvisCore";
 import { QuizPanel } from "./QuizPanel";
 import { FocusPanel } from "./FocusPanel";
 import { useJarvisData } from "@/hooks/useJarvisData";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/jarvis/config";
 
 const examples = ["Explain photosynthesis in simple words", "What is the Pythagorean theorem?", "Help me revise Java inheritance"];
 
@@ -26,10 +27,10 @@ export function HomePage() {
     if (!query || asking) return;
     setQuestion(query); setAnswer(""); setError(""); setAsking(true);
     try {
-      const apiUrl = `${import.meta.env['VITE_SUPABASE_URL']}/functions/v1/jarvis-ask`;
+      const apiUrl = `${SUPABASE_URL}/functions/v1/jarvis-ask`;
       const response = await fetch(apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env['VITE_SUPABASE_ANON_KEY']}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         body: JSON.stringify({ question: query }),
       });
       const data = await response.json();
