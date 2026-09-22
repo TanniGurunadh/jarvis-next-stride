@@ -161,6 +161,7 @@ export default function PlannerPage() {
     setPlan(null);
     setCompletedTasks(new Set());
     setErrorMsg('');
+    setSaveNotice('');
   };
 
   const completedCount = completedTasks.size;
@@ -552,6 +553,12 @@ export default function PlannerPage() {
                       );
                     })}
                   </div>
+
+                  {saveNotice && (
+                    <div className="glass-panel px-5 py-4 text-xs text-ink-400 leading-relaxed">
+                      Plan shown but not saved for your dashboard: {saveNotice}
+                    </div>
+                  )}
 
                   {/* Footer note */}
                   <div className="glass-panel px-5 py-4 flex items-center gap-3">
