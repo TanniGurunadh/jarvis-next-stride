@@ -21,30 +21,50 @@ function missingConfig(): string | null {
   return null;
 }
 
-/** Calls an existing Supabase Edge Function (e.g. jarvis-ask, generate-study-plan). */
+const RETRY_ATTEMPTS = 3;
+const RETRY_BASE_MS = 1_200;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Calls an existing Supabase Edge Function (e.g. jarvis-ask, generate-study-plan).
+ * The AI provider behind these functions occasionally answers 429/5xx (surfaced as
+ * "The AI service is temporarily unavailable"), so transient failures are retried
+ * with bounded backoff before the error reaches the UI.
+ */
 export async function invokeFunction<T>(
   name: string,
   body: unknown,
 ): Promise<ApiResult<T>> {
   const configError = missingConfig();
   if (configError) return { data: null, error: configError };
-  try {
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
-      method: "POST",
-      headers: baseHeaders(),
-      body: JSON.stringify(body),
-    });
-    const payload = (await response.json().catch(() => null)) as
-      | (T & { error?: string })
-      | null;
-    if (!response.ok) {
-      return { data: null, error: payload?.error || `Request to ${name} failed.` };
+
+  let lastError = `Request to ${name} failed.`;
+
+  for (let attempt = 0; attempt < RETRY_ATTEMPTS; attempt++) {
+    if (attempt > 0) await wait(RETRY_BASE_MS * attempt);
+    try {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+        method: "POST",
+        headers: baseHeaders(),
+        body: JSON.stringify(body),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | (T & { error?: string })
+        | null;
+      if (response.ok) {
+        if (!payload) return { data: null, error: `${name} returned an empty response.` };
+        return { data: payload as T, error: null };
+      }
+      lastError = payload?.error || `Request to ${name} failed.`;
+      const retryable = response.status === 429 || response.status >= 500;
+      if (!retryable) return { data: null, error: lastError };
+    } catch {
+      lastError = "Network error. Please check your connection and try again.";
     }
-    if (!payload) return { data: null, error: `${name} returned an empty response.` };
-    return { data: payload as T, error: null };
-  } catch {
-    return { data: null, error: "Network error. Please check your connection and try again." };
   }
+
+  return { data: null, error: lastError };
 }
 
 /** SELECT rows from a table in the existing Supabase project. */
